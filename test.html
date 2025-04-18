@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drug Detection Chat Analyzer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    h1 {
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 1em;
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    .results {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .message {
+      margin-bottom: 15px;
+    }
+    .suspicious {
+      color: red;
+      font-weight: bold;
+    }
+    .entity {
+      background: yellow;
+      padding: 2px 4px;
+      border-radius: 3px;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chat Analyzer (Drug Suspicion Detector)</h1>
+  <textarea id="chatInput" placeholder="Paste chat messages here..."></textarea>
+  <button onclick="analyzeMessages()">Analyze</button>
+
+  <div class="results" id="results"></div>
+
+  <script>
+    async function analyzeMessages() {
+      const chatText = document.getElementById("chatInput").value;
+      const response = await fetch("http://localhost:5000/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: chatText })
+      });
+
+      const data = await response.json();
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+
+      data.results.forEach((msg, i) => {
+        const messageEl = document.createElement("div");
+        messageEl.classList.add("message");
+
+        const msgHeader = document.createElement("div");
+        msgHeader.innerHTML = `Message ${i + 1}: ${msg.text}`;
+        if (msg.suspicious) {
+          msgHeader.classList.add("suspicious");
+        }
+        messageEl.appendChild(msgHeader);
+
+        if (msg.entities.length > 0) {
+          msg.entities.forEach(entity => {
+            const span = document.createElement("span");
+            span.classList.add("entity");
+            span.innerText = `${entity.text} [${entity.label}]`;
+            messageEl.appendChild(span);
+          });
+        }
+
+        resultsDiv.appendChild(messageEl);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+{
+  "drugs": ["coke", "weed", "heroin", "lsd", "meth", "ecstasy", "stuff", "snow"],
+  "actions": ["buy", "sell", "get", "score", "supply", "deliver"]
+}
